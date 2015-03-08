@@ -1,11 +1,19 @@
-class AssertionError < Exception; end
-
 def describe(description, &block)
-  block.call
+  ExampleGroup.new(block).evaluate!
 end
 
-def it(description, &block)
-  block.call
+class ExampleGroup
+  def initialize(block)
+    @block = block
+  end
+
+  def evaluate!
+    instance_eval(&@block)
+  end
+
+  def it(description, &block)
+    block.call
+  end
 end
 
 class Object
@@ -13,6 +21,8 @@ class Object
     DelayedAssertion.new(self)
   end
 end
+
+class AssertionError < Exception; end
 
 class DelayedAssertion
   def initialize(subject)
